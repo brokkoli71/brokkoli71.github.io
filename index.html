@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>QR Share</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<link rel="stylesheet" href="../styles.css">
+<style>
+    .header{
+        background-color: #56820377;
+    }
+    .footer{
+        background-color: #17820377;
+    }
+</style>
+
+<body>
+   <p>Gib text ein, dann wird ein QR code mit diesem Text generiert und du kannst den auf deinem Smartphone kopieren (klick irgendwo außerhalb des textfeldes um den QR code zu aktualisieren)</p>
+   <input class="input" onblur="updateQRCode(this.value)" value=""/>
+   <br>
+   <br>
+   <div id="shared-content"></div>
+   <br>
+   <br>
+   <iframe id="qrcode" src="" width="250" height="250"></iframe>
+   <br>
+   <br>
+    <div class="footer">
+        <p>Die Datenübertragung ist serverlos nur über den QR Code.</p>
+    </div>
+
+   <script>
+       function updateQRCode(val) {
+           const url = location.protocol + '://' + location.host + location.pathname;
+           if (val) {
+               url += "?share=" + encodeURIComponent(val);
+           }
+           document.getElementById("qrcode").setAttribute("src", "https://api.mimfa.net/qrcode?value=" + encodeURIComponent(url) + "&as=value");
+       }
+
+       document.addEventListener("DOMContentLoaded", function() {
+           // Simulate blur event on input to trigger initial QR code generation
+           const input = document.querySelector('.input');
+           input.dispatchEvent(new Event('blur'));
+       });
+
+       // Function to display shared content
+       function displaySharedContent(content) {
+           const sharedContentDiv = document.getElementById('shared-content');
+           sharedContentDiv.innerHTML = `<h2>Geteilte Inhalte:</h2><h1>${content}</h1>`;
+       }
+
+       // Listen for URL parameters
+       window.addEventListener('load', function() {
+           const params = new URLSearchParams(window.location.search);
+           const shareParam = params.get('share');
+           if (shareParam) {
+               displaySharedContent(decodeURIComponent(shareParam));
+           }
+       });
+   </script>
+</body>
+</html>
